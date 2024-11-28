@@ -1,0 +1,107 @@
+@startuml jobs_data_model
+enum EmploymentType {
+  Full_Time
+  Part_Time
+  Contract
+  Temporary
+  Internship
+}
+
+enum TimeUnit {
+  Hourly
+  Weekly
+  Monthly
+  Annually
+}
+
+enum BenefitType {
+  Health_Insurance
+  Life_Insurance
+  Paid_Time_Off
+  Retirement_Plan
+  Disability_Insurance
+  Dental_Insurance
+  Employee_Assistant_Program
+  Other
+}
+
+enum QualificationType {
+  Education
+  Experience
+  Skill
+  Certification
+  Language
+  Physical_Requirement
+  Personal_Attribute
+  Industry_Specific
+}
+
+enum ConditionsOfEmployment {
+  Work_Authorization
+  Drug_Screening
+  Security_Clearance
+  Travel_Requirement
+  Other
+}
+
+class JobPosting {
+  title: String
+  employmentType: EmploymentType
+  summary: String
+  'personal or professional development opportunities
+  opportunities: List<String>
+  remote: Boolean
+  location: Location
+}
+
+class Salary {
+  min: Double
+  max: Double
+  currency: String
+  unit: TimeUnit
+}
+
+class Company {
+  name: String
+  culture: String
+  equalOpportunityStatement: String
+}
+
+class Location {
+  city: String
+  state: String
+  country: String
+}
+
+class Benefit {
+  type: BenefitType
+  name: String
+  description: String
+}
+
+class Responsability {
+  title: String
+  description: String
+}
+
+class Qualification {
+  type: QualificationType
+  name: String
+  description: String
+  required: Boolean
+}
+
+'requirements or such as specific legal or policy adherence without mixing in qualifications.
+class EmploymentCondition {
+  type: ConditionsOfEmployment
+  description: String
+}
+
+JobPosting *--> "1" Company
+JobPosting *--> "0..1" Salary
+JobPosting *--> "0..1" Location
+JobPosting *-left-> "0..*" Benefit
+JobPosting *-> "0..*" Responsability
+JobPosting *--> "0..*" Qualification
+JobPosting *--> "0..*" EmploymentCondition
+@enduml

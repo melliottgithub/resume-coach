@@ -1,0 +1,9 @@
+pyyaml
+crewai[tools]
+fastapi[standard]
+boto3
+pynamodb
+bcrypt
+tiktoken
+pymupdf
+PyJWT

@@ -1,0 +1,41 @@
+extract_job_data:
+  description: >
+    {jobs-plantuml}
+
+    Extract structured data from the job description in JSON format according to the class structure of PlantUML, provide respose as JSON document with camelCase keys:
+
+    {job_description_text}
+
+  expected_output: >
+    A JSON document containing accurately extracted data from job description content.
+
+  agent_role: Data Extractor
+
+resume_job_fit_analysis:
+  description: >
+    Analyze the extracted resume and job description data to identify gaps.
+    Provide detailed insights into what the candidate is missing compared to the job requirements.
+    Functions:
+    - Analyze job descriptions for key qualifications and skills.
+    - Compare client profiles to job requirements, highlighting matches and areas for improvement.
+
+  expected_output: >
+    A detailed report that outlines the candidate’s strengths, transferable skills, and specific gaps between the resume and job description, encouraging self-awareness.
+
+  agent_role: Job Analysis Specialist
+  context: extract_job_data
+
+generate_feedback:
+  description: >
+    Develop a feedback empathetic report based on the gap analysis that is actionable and encouraging.
+    Feedback should align with the client’s career goals, support growth, and suggest concrete steps to enhance the resume for better job alignment.
+    Coaching Mindset: Embodies a coaching mindset by delivering a report that is open, flexible, and client-centered, focusing on constructive insights rather than solely on deficits.
+
+  expected_output: >
+    A feedback report written in an encouraging and accessible format, containing specific and actionable suggestions for resume improvement, such as wording adjustments, skill additions, or highlighting relevant experience.
+    Includes motivational support by emphasizing clients' strengths and core competencies in relation to their desired roles.
+    Evoke Awareness: Guide the client toward a deeper understanding of their skills and potential fit, encouraging reflection on the suggested improvements.
+    Facilitate Client Growth: Include clear next steps for resume enhancement that allow the client to take actionable measures toward their career goals.
+
+  agent_role: Career Coach
+  context: resume_job_fit_analysis
