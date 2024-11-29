@@ -47,7 +47,49 @@ export class ServicesStack extends cdk.Stack {
 
     // Custom VPC
     const vpc = new ec2.Vpc(this, `${this.stackName}-vpc`, {
+      defaultInstanceTenancy: ec2.DefaultInstanceTenancy.DEFAULT,
       maxAzs: 2,
+      natGateways: 0,
+      subnetConfiguration: [
+        {
+          cidrMask: 24,
+          name: 'public',
+          subnetType: ec2.SubnetType.PUBLIC,
+        },
+        {
+          cidrMask: 24,
+          name: 'private',
+          subnetType: ec2.SubnetType.PRIVATE_ISOLATED
+        },
+      ],
+    });
+
+    // Add VPC Endpoints for ECR
+    vpc.addInterfaceEndpoint(`${this.stackName}-ecr-api-endpoint`, {
+      service: ec2.InterfaceVpcEndpointAwsService.ECR,
+    });
+
+    vpc.addInterfaceEndpoint(`${this.stackName}-ecr-dkr-endpoint`, {
+      service: ec2.InterfaceVpcEndpointAwsService.ECR_DOCKER,
+    });
+
+    // Add S3 Gateway Endpoint (ECR depends on S3)
+    vpc.addGatewayEndpoint(`${this.stackName}-s3-endpoint`, {
+      service: ec2.GatewayVpcEndpointAwsService.S3,
+    });
+
+    // Add VPC Endpoints for CloudWatch Logs and Monitoring
+    vpc.addInterfaceEndpoint(`${this.stackName}-cw-logs-endpoint`, {
+      service: ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
+    });
+
+    vpc.addInterfaceEndpoint(`${this.stackName}-cw-monitoring-endpoint`, {
+      service: ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH,
+    });
+
+    // Add DynamoDB Gateway Endpoint
+    vpc.addGatewayEndpoint(`${this.stackName}-dynamodb-endpoint`, {
+      service: ec2.GatewayVpcEndpointAwsService.DYNAMODB,
     });
 
     // ECS Cluster
@@ -120,6 +162,8 @@ export class ServicesStack extends cdk.Stack {
     // Allow inbound traffic on port 8000
     fargateSecurityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(8000), 'Allow inbound traffic on port 8000');
     fargateSecurityGroup.addIngressRule(ec2.Peer.anyIpv6(), ec2.Port.tcp(8000), 'Allow inbound traffic on port 8000');
+    // Allow outbound traffic on all ports
+    fargateSecurityGroup.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.allTraffic(), 'Allow outbound traffic on all ports');
 
     // Expose a port for the container
     container.addPortMappings({
