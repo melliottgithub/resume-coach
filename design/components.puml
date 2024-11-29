@@ -1,0 +1,35 @@
+@startuml components
+
+package app {
+  component rest_api
+  component jobs_import_cli
+}
+
+package domain {
+  component job_applications
+  component coaching
+  component documents
+  component jobs
+  component users
+
+  job_applications --> jobs
+  job_applications --> documents
+}
+
+package infrastructure {
+  component dynamodb
+  component object_storage_s3
+  component agents
+  component chatbot
+}
+
+package services {
+  component job_application_service
+}
+
+app ..> services
+services .up.> infrastructure
+services ...> domain
+infrastructure ..> domain
+
+@enduml
