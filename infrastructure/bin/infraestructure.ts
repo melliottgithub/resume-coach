@@ -4,6 +4,8 @@ import * as cdk from 'aws-cdk-lib';
 import { WebAppStack } from '../lib/webapp';
 import { StorageStack } from '../lib/storage';
 import { ServicesStack } from '../lib/services';
+import { Lambda } from 'aws-cdk-lib/aws-ses-actions';
+import { LambdaStack } from '../lib/lambda';
 
 const appName = 'resume-coach';
 
@@ -23,4 +25,8 @@ new ServicesStack(app, 'services', {
 
 new WebAppStack(app, 'webapp', {
   stackName: `${appName}-webapp`,
+});
+
+new LambdaStack(app, 'lambda', {
+  stackName: `${appName}-lambda`,
 });
