@@ -65,3 +65,5 @@ Example `.env` file:
 ```
 VITE_API_ENDPOINT=<url-for-backend-services>
 ```
+
+> Note: URL for backend is the AWS Lambda Function URL
