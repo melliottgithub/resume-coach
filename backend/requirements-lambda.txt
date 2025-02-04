@@ -1,0 +1,8 @@
+langchain_openai
+pyyaml
+crewai
+pynamodb
+bcrypt
+pymupdf
+PyJWT
+mangum

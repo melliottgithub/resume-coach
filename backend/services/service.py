@@ -1,6 +1,7 @@
 import datetime
 from typing import List, Optional, Tuple
 from uuid import UUID
+
 from fastapi import HTTPException
 
 from inject import Injector
@@ -48,7 +49,10 @@ class JobApplicationService:
 
     def get_job_by_id(self, job_id: str):
         job_uuid = UUID(job_id)
-        return self.jobs.get_job_by_id(job_uuid.hex)
+        try:
+            return self.jobs.get_job_by_id(job_uuid.hex)
+        except Exception as e:
+            raise HTTPException(status_code=404, detail="Job not found")
     
     def create_job(self, company: str, job_title: str, address: Address, apply_url: str, \
         source_id: str, last_updated: datetime, description: str):
@@ -71,10 +75,11 @@ class JobApplicationService:
 
     def get_job_description_by_id(self, job_id: str) -> str:
         job_uuid = UUID(job_id)
-        job_document = self.documents.get_by_id(job_uuid, DocumentType.JOB_DESCRIPTION)
-        if job_document is None:
+        try:
+            job_document = self.documents.get_by_id(job_uuid, DocumentType.JOB_DESCRIPTION)
+            return job_document.content       
+        except Exception as e:
             raise HTTPException(status_code=404, detail="Job description not found")
-        return job_document.content
 
     # Job Application operations
     def list_applications(self, user_id: str, limit: int = 10) -> list[JobApplication]:

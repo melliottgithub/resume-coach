@@ -12,13 +12,13 @@ job_application_service = JobApplicationService()
 def create_root():
     return {"ok": True}
 
-@app.get("/api/")
+@app.get("/")
 async def root():
     return {"ok": True}
 
 # Auth endpoints
 
-@app.post("/api/auth")
+@app.post("/auth")
 async def auth(request: models.AuthRequest):
     user = job_application_service.authenticate_user(request.email, request.password)
     access_token = encode_jwt(user.id.hex)
@@ -26,28 +26,28 @@ async def auth(request: models.AuthRequest):
         
 # Users Endpoints
 
-@app.get("/api/users/me", dependencies=[Depends(verify_token)])
+@app.get("/users/me", dependencies=[Depends(verify_token)])
 async def user(user_id = Depends(verify_token)) -> models.UserResponse:
     user = job_application_service.get_user_by_id(user_id)
     return models.UserResponse(id=user.id.hex, name=user.name, email=user.email)
 
-@app.post("/api/users")
+@app.post("/users")
 async def user(request: models.UserRequest) -> models.UserResponse:
     user = job_application_service.create_user(request.name, request.email, request.password)
     return models.UserResponse(id=user.id.hex, name=user.name, email=user.email)
 
 # Jobs Endpoints
 
-@app.get("/api/jobs")
+@app.get("/jobs")
 async def jobs(limit: int = 10, last_key_value: str = None) -> models.JobPaginedList:
     jobs, new_last_key_value = job_application_service.list_jobs(limit=limit, last_key_value=last_key_value)
     return models.JobPaginedList(items=jobs, limit=limit, last_key_value=new_last_key_value)
 
-@app.get("/api/jobs/{id}")
+@app.get("/jobs/{id}")
 async def job(id: str):
     return job_application_service.get_job_by_id(id)
 
-@app.get("/api/jobs/{id}/description",
+@app.get("/jobs/{id}/description",
          response_class=PlainTextResponse,
          responses={200: {"content": {"text/plain": {}}}})
 async def get_job_description(id: str):
@@ -55,11 +55,11 @@ async def get_job_description(id: str):
 
 # Job Application Endpoints
 
-@app.get("/api/applications", dependencies=[Depends(verify_token)])
+@app.get("/applications", dependencies=[Depends(verify_token)])
 async def get_applications(user_id = Depends(verify_token), limit: int = 10):
     return job_application_service.list_applications(user_id, limit=limit)
 
-@app.post("/api/applications", dependencies=[Depends(verify_token)])
+@app.post("/applications", dependencies=[Depends(verify_token)])
 async def create_applications(request: models.JobApplicationRequest, user_id = Depends(verify_token)):
     if user_id is None:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -71,22 +71,22 @@ async def create_applications(request: models.JobApplicationRequest, user_id = D
         resume_file=decode_base64(request.resume_file_base64))
     return job_application
 
-@app.post("/api/applications/{id}/analyze",
+@app.post("/applications/{id}/analyze",
           response_class=PlainTextResponse,
           responses={200: {"content": {"text/plain": {}}}},
           dependencies=[Depends(verify_token)])
 async def applications_analyze(id: str, user_id = Depends(verify_token)):
     return job_application_service.create_application_analysis(user_id, id)
 
-@app.get("/api/applications/{id}")
+@app.get("/applications/{id}")
 async def get_application(id: str):
     return job_application_service.get_application_details_by_id(id)
 
-@app.get("/api/applications/{id}/chat")
+@app.get("/applications/{id}/chat")
 async def applications_chat_message(id: str):
     return job_application_service.get_chat_messages(id)
 
-@app.post("/api/applications/{id}/chat")
+@app.post("/applications/{id}/chat")
 async def applications_chat_message(id: str, request: models.ChatMessageRequest):
     return job_application_service.send_chat_message(id, request.message)
 
